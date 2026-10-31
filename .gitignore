@@ -1,0 +1,25 @@
+
+# Java / Maven
+**/target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Node.js / React
+node_modules/
+dist/
+.next/
