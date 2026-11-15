@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router";
 import { useBook } from "../hooks/useBook";
+import { ReviewsSection } from "../components/ReviewsSection";
 
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -38,6 +39,7 @@ export function BookDetailsPage() {
 
           <h2>About this book</h2>
           <p className="details-description">{book.description}</p>
+          <ReviewsSection bookId={book.id} />
         </article>
       )}
     </main>

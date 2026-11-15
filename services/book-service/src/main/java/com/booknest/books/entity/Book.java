@@ -1,4 +1,3 @@
-
 package com.booknest.books.entity;
 
 import jakarta.persistence.*;

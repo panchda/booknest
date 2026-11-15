@@ -1,0 +1,2 @@
+CREATE DATABASE reviews_db;
+CREATE DATABASE auth_db;

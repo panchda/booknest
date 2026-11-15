@@ -23,10 +23,10 @@ export function BooksPage() {
 
   return (
     <main className="app">
-      <header>
-        <h1>BookNest 📚</h1>
-        <p>Discover your next favorite book.</p>
-      </header>
+      <div className="page-intro">
+        <h1>Discover your next favorite book 📚</h1>
+        <p>Explore our collection and find something you'll love.</p>
+      </div>
 
       <input
         className="search-input"

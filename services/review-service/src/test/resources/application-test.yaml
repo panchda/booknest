@@ -1,0 +1,2 @@
+jwt:
+  secret: "booknest-test-secret-key-for-jwt-validation-2026"

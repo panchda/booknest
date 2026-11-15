@@ -11,6 +11,14 @@ spring:
               uri: lb://book-service
               predicates:
                 - Path=/api/v1/books/**,/api/v1/books
+            - id: review-service
+              uri: lb://review-service
+              predicates:
+                - Path=/api/v1/reviews,/api/v1/reviews/**
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/v1/auth/**
 
 server:
   port: 8080
@@ -18,4 +26,4 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
