@@ -352,3 +352,92 @@
 .review-login-link:hover {
   background: #b64f7c;
 }
+
+.admin-books {
+  margin-top: 3rem;
+  padding: 1.5rem;
+  border: 1px solid #f4c7da;
+  border-radius: 16px;
+  background: #fff7fb;
+}
+
+.admin-books-header,
+.admin-book-row,
+.admin-book-actions,
+.book-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-books-header {
+  margin-bottom: 1.5rem;
+}
+
+.admin-books button {
+  cursor: pointer;
+  border: 1px solid #e5a3c0;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  background: white;
+  color: #9c3265;
+}
+
+.admin-books button:hover:not(:disabled) {
+  background: #ffe5f0;
+}
+
+.admin-books button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-book-row {
+  padding: 1rem 0;
+  border-bottom: 1px solid #f4c7da;
+}
+
+.admin-book-row:last-child {
+  border-bottom: none;
+}
+
+.admin-book-row p {
+  margin: 0.25rem 0 0;
+}
+
+.book-form {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: white;
+}
+
+.book-form label {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.book-form input,
+.book-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem;
+  border: 1px solid #e5a3c0;
+  border-radius: 8px;
+  font: inherit;
+}
+
+@media (max-width: 600px) {
+  .admin-books-header,
+  .admin-book-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-book-actions {
+    flex-wrap: wrap;
+  }
+}

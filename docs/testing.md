@@ -17,13 +17,13 @@ The script:
 5. Runs `./mvnw test` sequentially for Book Service, Review Service, and Auth Service.
 6. Stops on any failure and prints `All backend tests passed!` on success.
 
-The most recent confirmed run contained **31 passing tests**: Book Service 16, Review Service 6, Auth Service 9. These include unit tests and application-context tests.
+The most recent confirmed run contained **35 passing tests**: Book Service 16, Review Service 6, Auth Service 13. These include unit tests and application-context tests.
 
 ### Unit-test focus
 
 - **Book Service:** Listing, searching, retrieving, and book operations.
 - **Review Service:** Listing reviews, trimming submitted fields, validating that books exist, and deletion behavior.
-- **Auth Service:** Registration, email normalization, duplicate-email handling, login, password checks, and JWT generation.
+- **Auth Service:** Registration, email normalization, duplicate-email handling, login, password checks, JWT generation, and four `AdminDataInitializerTest` scenarios (creation, password encoding, existing account, disabled initializer).
 
 Unit tests use JUnit 5 and Mockito to isolate service logic. Application-context tests also check that Spring Boot can initialize with the required configuration.
 
@@ -38,6 +38,7 @@ Use a fresh GitHub ZIP or a new clone in a separate directory. **Do not delete e
 - [ ] Extract the project and open a terminal in its root directory.
 - [ ] Copy `.env.example` to `.env`.
 - [ ] Set `DB_PASSWORD` and generate `JWT_SECRET` using `openssl rand -base64 32`.
+- [ ] To test admin features, set `DEMO_ADMIN_ENABLED=true`, `ADMIN_EMAIL`, and a unique `ADMIN_PASSWORD`; confirm these are passed into Auth Service in Docker Compose.
 
 ### Application startup
 
@@ -59,12 +60,16 @@ Use a fresh GitHub ZIP or a new clone in a separate directory. **Do not delete e
 - [ ] Sign out and confirm the protected review form is hidden.
 - [ ] Confirm missing or invalid JWTs are rejected on protected API endpoints.
 - [ ] Confirm USER and ADMIN permissions behave as configured.
-- [ ] Verify administrative book CRUD and review deletion using a preconfigured ADMIN account (public registration does not create one).
+- [ ] Sign in as the demo `ADMIN` using the credentials from `.env`; verify the frontend displays the book management controls.
+- [ ] Create a book, edit it, and delete it through the frontend.
+- [ ] Verify an ordinary `USER` cannot create, update, or delete books through direct API calls (expect 403 for a valid non-admin JWT).
+- [ ] Verify review deletion with an `ADMIN` JWT (public registration does not create admins).
+- [ ] Restart Auth Service and verify the initializer does not create a duplicate demo administrator.
 
 ### Automated verification
 
 - [ ] Run `./run-tests.sh` (or `bash run-tests.sh` if archive permissions were lost).
-- [ ] Confirm all three service test suites succeed.
+- [ ] Confirm all three service test suites succeed (35 tests total in the latest verified run).
 - [ ] Confirm the script ends with `All backend tests passed!`.
 
 ### Shutdown
@@ -86,6 +91,8 @@ This retains the PostgreSQL volume. `docker compose down -v` deletes persistent 
 | Maven context test fails | `.env` loaded and PostgreSQL available |
 | Seed books missing | Fresh database volume, Book Service logs, initializer class |
 | Admin requests return 403 | Account role is `USER`; an ADMIN account is required |
+| Demo admin not created | Verify `DEMO_ADMIN_ENABLED=true`, environment variable forwarding to Auth Service, and `demo.admin.*` Spring properties |
+| Demo admin login fails after changing password | The initializer does not overwrite an existing account; changing `.env` alone will not reset its stored password |
 
 ## Evidence for assessment
 

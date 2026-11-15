@@ -73,6 +73,9 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       EUREKA_URL: http://discovery-server:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      DEMO_ADMIN_ENABLED: ${DEMO_ADMIN_ENABLED:-false}
     depends_on:
       postgres:
         condition: service_healthy

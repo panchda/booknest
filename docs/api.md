@@ -36,7 +36,11 @@ Example response shape:
 {"accessToken":"<jwt>","tokenType":"Bearer","expiresIn":3600}
 ```
 
-**Note:** The response field names shown above should be checked against `AuthResponse.java` before final submission. Invalid credentials result in **401 Unauthorized**.
+The response fields are defined by `AuthResponse.java`: `accessToken` (string), `tokenType` (string), and `expiresIn` (long, seconds). With the current Auth Service implementation, `expiresIn` is `3600` seconds (one hour). Invalid credentials result in **401 Unauthorized**.
+
+### Demo administrator
+
+For local testing, set `DEMO_ADMIN_ENABLED=true`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in `.env` and pass these variables to Auth Service through Docker Compose. The initializer creates an `ADMIN` account if the email does not already exist. Sign in through the same `/api/v1/auth/login` endpoint as any other user. Registration always creates a `USER`, not an `ADMIN`. Do not publish real demo passwords in the repository.
 
 ## Books
 
@@ -49,7 +53,7 @@ Example response shape:
 | PUT | `/api/v1/books/{id}` | Update a book | 200; 404 if missing |
 | DELETE | `/api/v1/books/{id}` | Delete a book | 204; 404 if missing |
 
-The read endpoints are public. Book creation, update, and deletion are administrative operations under the project's JWT role-based security configuration.
+The read endpoints are public. `POST`, `PUT`, and `DELETE` book operations require a valid JWT with the `ADMIN` role, as enforced by `JwtSecurityConfig.java`. The React frontend exposes book creation, editing, and deletion controls to signed-in administrators; server-side authorization remains authoritative.
 
 Example book request for create/update:
 
@@ -109,6 +113,20 @@ Example response:
 }
 ```
 
+## Admin book management example
+
+After signing in with the configured demo administrator, copy the `accessToken` from the login response into a shell variable and use it to create a book:
+
+```bash
+TOKEN="paste-admin-access-token-here"
+curl -i -X POST http://localhost:8080/api/v1/books \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"title":"Demo Book","author":"Demo Author","genre":"Testing","description":"Created by an administrator."}'
+```
+
+A successful creation returns **201 Created** with a `Location` header. `PUT /api/v1/books/{id}` and `DELETE /api/v1/books/{id}` use the same admin authorization header. Ordinary `USER` tokens must not be able to modify books.
+
 ## Quick curl examples
 
 List books:
@@ -164,4 +182,4 @@ curl -i -X POST http://localhost:8080/api/v1/reviews \
 
 Error bodies depend on Spring Boot's exception handling and may differ from the examples above.
 
-**Before final submission:** Verify exact field names in `AuthResponse.java`, DTO validation constraints, and the current Book Service security matcher rules. The controller code alone does not define security permissions.
+**Validation note:** Exact input validation constraints are defined in the request DTOs; consult those classes for field-level requirements.

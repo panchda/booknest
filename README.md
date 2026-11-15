@@ -8,7 +8,9 @@ BookNest is a full-stack book catalog and review application built as a Java/Spr
 - View book reviews and average ratings.
 - Register, sign in, and sign out through the web interface.
 - Submit reviews as an authenticated user.
-- Manage books through administrative API operations.
+- Create, edit, and delete books through the web interface when signed in as an administrator.
+- Manage books through protected administrative API operations.
+- Optionally seed a demo administrator account from environment variables.
 - Restrict review deletion to administrators.
 - Automatically populate an empty book catalog with five sample books.
 - Run backend unit and application-context tests using one script.
@@ -105,6 +107,11 @@ Edit `.env`:
 DB_USERNAME=booknest
 DB_PASSWORD=choose-a-local-password
 JWT_SECRET=replace-with-generated-base64-secret
+
+# Optional local demo administrator
+DEMO_ADMIN_ENABLED=true
+ADMIN_EMAIL=admin@booknest.local
+ADMIN_PASSWORD=choose-a-unique-demo-password
 ```
 
 Generate a random 32-byte JWT signing key and paste the output as `JWT_SECRET`:
@@ -114,6 +121,8 @@ openssl rand -base64 32
 ```
 
 The signing key must be the **same** for the authentication service and services that verify JWTs. Do not commit `.env` or share a real secret.
+
+For the demo administrator to be created, `auth-service` must receive `DEMO_ADMIN_ENABLED`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` through its `environment` section in `docker-compose.yml`, and its Spring configuration must map them to `demo.admin.enabled`, `demo.admin.email`, and `demo.admin.password`. Set `DEMO_ADMIN_ENABLED=false` to disable automatic admin creation. Use a unique password; do not reuse sample passwords in a public deployment.
 
 ### 3. Start the application
 
@@ -143,7 +152,7 @@ curl -i http://localhost:8080/api/v1/books
 
 Expect seven running containers, PostgreSQL marked `healthy`, and an HTTP `200` response containing the initial books. If the API is briefly unavailable, wait for service registration and retry.
 
-In the browser, register a user, sign in, open a book, submit a review, and sign out. Anonymous users should still be able to browse books and read reviews.
+In the browser, register a user, sign in, open a book, submit a review, and sign out. Anonymous users should still be able to browse books and read reviews. If demo admin seeding is enabled, sign in using `ADMIN_EMAIL` and `ADMIN_PASSWORD` from your local `.env` and verify the book management interface (create, edit, and delete).
 
 ### 6. Stop the application
 
@@ -163,7 +172,21 @@ Authorization: Bearer <access-token>
 
 The JWT contains a user ID (`sub`), email, role, issue time, and expiration time. Tokens expire after **one hour** under the provided configuration.
 
-New registrations receive the `USER` role. Administrative operations require an existing `ADMIN` account; there is no public admin registration endpoint. See [API documentation](docs/api.md) for the role requirements.
+New registrations receive the `USER` role. Book creation, update, and deletion require an `ADMIN` JWT (verified by Book Service); there is no public admin registration endpoint. The frontend reads the role from the JWT and shows book management controls to administrators. The backend still enforces permissions independently of the UI.
+
+### Optional demo administrator
+
+For local demonstrations, set the following in `.env`:
+
+```dotenv
+DEMO_ADMIN_ENABLED=true
+ADMIN_EMAIL=admin@booknest.local
+ADMIN_PASSWORD=choose-a-unique-demo-password
+```
+
+On startup, Auth Service creates the demo administrator **only if the configured email does not already exist**. The password is encoded with the application's `PasswordEncoder` before being stored. Restarting the service does not create a duplicate or change the existing account's role or password. To disable automatic creation, use `DEMO_ADMIN_ENABLED=false`. Never enable predictable demo credentials in production.
+
+See [API documentation](docs/api.md) for the role requirements.
 
 ## API overview
 
@@ -194,7 +217,7 @@ From the repository root:
 
 The script loads `.env`, checks Docker Compose, starts PostgreSQL if necessary, and runs Maven tests for `book-service`, `review-service`, and `auth-service`. It stops on the first failure.
 
-The latest verified test run contained **31 passing backend tests** across the three services. Results can change when code or tests are updated.
+The latest verified test run contained **35 passing backend tests** across the three services (Book Service: 16; Review Service: 6; Auth Service: 13). Four Auth Service tests cover the demo admin initializer. Results can change when code or tests are updated.
 
 On macOS/Linux, `run-tests.sh` should retain its executable Git permission (`100755`). If executing from an extracted archive where permissions were lost, use:
 

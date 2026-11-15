@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { BookCard } from "../components/BookCard";
+import { AdminBookManager } from "../components/AdminBookManager";
 import { useBooks } from "../hooks/useBooks";
+import { useAuthStore } from "../stores/useAuthStore";
 
 export function BooksPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  const isAdmin = useAuthStore((state) => state.user?.role === "ADMIN");
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -53,6 +57,8 @@ export function BooksPage() {
           </section>
 
           {books.length === 0 && <p>No books found.</p>}
+
+          {isAdmin && <AdminBookManager books={books} />}
         </>
       )}
     </main>
